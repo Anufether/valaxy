@@ -6,7 +6,7 @@
   "packageManager": "pnpm@9.10.0",
   "description": "📄 Vite & Vue powered static blog generator.",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "@anufether:registry": "https://npm.pkg.github.com"
   },
   "license": "MIT",
   "repository": "https://github.com/Anufether/valaxy",
