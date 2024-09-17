@@ -105,6 +105,20 @@ export const defaultSiteConfig: SiteConfig = {
     useVueRouter: true,
     rules: [],
   },
+
+  deploy: {
+    enable: true,
+    host: 'example.com',
+    port: 22,
+    user: 'username',
+    password: 'password',
+    privateKey: '/path/to/private/key',
+    passphrase: 'your-passphrase',
+    agent: '$SSH_AUTH_SOCK',
+    remotePath: '/remote/path',
+    forceUpload: false,
+    concurrency: 10,
+  },
 }
 
 /**

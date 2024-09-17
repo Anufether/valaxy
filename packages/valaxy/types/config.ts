@@ -358,6 +358,79 @@ export interface SiteConfig {
     useVueRouter?: boolean
     rules?: RedirectRule[]
   }
+
+  deploy: {
+    /**
+     * @description:en-US Enable or disable the deployment
+     * @description:zh-CN 启用或禁用部署
+     */
+    enable: boolean
+
+    /**
+     * @description:en-US Address of the remote host
+     * @description:zh-CN 远程主机的地址
+     */
+    host: string
+
+    /**
+     * @description:en-US Port for the SFTP connection
+     * @description:zh-CN SFTP 连接的端口
+     * @default 22
+     */
+    port: number
+
+    /**
+     * @description:en-US Username for the SFTP connection
+     * @description:zh-CN SFTP 连接的用户名
+     */
+    user: string
+
+    /**
+     * @description:en-US Password for the SFTP connection
+     * @description:zh-CN SFTP 连接的密码
+     */
+    password: string
+
+    /**
+     * @description:en-US Directory address of the SSH private key
+     * @description:zh-CN SSH 私钥的目录地址
+     */
+    privateKey?: string
+
+    /**
+     * @description:en-US Optional passphrase for the SSH private key
+     * @description:zh-CN SSH 私钥的可选密码
+     */
+    passphrase?: string
+
+    /**
+     * @description:en-US Directory address of the SSH agent socket
+     * @description:zh-CN SSH 套接字的目录地址
+     * @default $SSH_AUTH_SOCK
+     */
+    agent?: string
+
+    /**
+     * @description:en-US Path to the root directory on the remote host
+     * @description:zh-CN 远程主机的根目录
+     * @default /
+     */
+    remotePath: string
+
+    /**
+     * @description:en-US Whether to force upload and overwrite existing files
+     * @description:zh-CN 是否强制上传并覆盖现有文件
+     * @default false
+     */
+    forceUpload?: boolean
+
+    /**
+     * @description:en-US Maximum number of concurrent SFTP tasks
+     * @description:zh-CN 同时处理的 SFTP 任务的最大数量
+     * @default 100
+     */
+    concurrency?: number
+  }
 }
 
 export type PartialDeep<T> = {

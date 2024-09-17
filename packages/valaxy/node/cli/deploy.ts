@@ -1,71 +1,59 @@
+import path from 'node:path'
 import process from 'node:process'
-import type { Argv } from 'yargs'
-import { confirm, intro, outro, select } from '@clack/prompts'
-import { execBuild } from './build'
+import type yargs from 'yargs'
+import consola from 'consola'
+import { deploy } from 'sftp-sync-deploy'
+import { defaultSiteConfig } from '../config/site'
+import { exists } from './utils/fs'
 
-/**
- * valaxy deploy
- * - gh-pages
- * - your own server
- * @TODO add config
- */
-export function registerDeployCommand(cli: Argv) {
-  cli.command('deploy', 'deploy your blog to the cloud', async () => {
-    intro('Deploying Your Blog')
-    // build
+export async function deployDist() {
+  const distDir = path.join(process.cwd(), 'dist')
 
-    /**
-     * build before deploying
-     */
-    const shouldBuild = await confirm({
-      message: 'Do you want to build your blog before deploying?',
-    })
+  const sftpConfig = defaultSiteConfig.deploy
 
-    if (shouldBuild) {
-      // build
-      await execBuild({ ssg: true, root: process.cwd(), output: 'dist', log: 'info' })
+  consola.box('🚀 Starting deployment...')
+
+  if (await exists(distDir)) {
+    consola.info('dist directory found, deploying...')
+
+    const config = {
+      host: sftpConfig.host,
+      port: sftpConfig.port || 22,
+      username: sftpConfig.user,
+      password: sftpConfig.password,
+      localDir: distDir,
+      remoteDir: sftpConfig.remotePath || '/var/www/html',
     }
 
-    const deployType = await select({
-      message: 'Where do you want to deploy?',
-      options: [
-        { label: 'GitHub Pages', value: 'gh-pages', hint: 'You need install `gh-pages` dependencies.' },
-        { label: 'Your Own Server', value: 'server' },
-      ],
-    })
-
-    if (deployType === 'gh-pages') {
-      // gh-pages
-      // check if gh-pages is installed
-      let isGhPagesInstalled = false
-      try {
-        await import('gh-pages')
-        isGhPagesInstalled = true
-      }
-      catch (e) {
-        console.error(e)
-        const installGhPages = await confirm({
-          message: 'Do you want to install `gh-pages` now?',
-        })
-        if (installGhPages) {
-          await import('@antfu/install-pkg')
-            .then(i => i.installPackage('gh-pages', { dev: true }))
-          isGhPagesInstalled = true
-        }
-        else {
-          outro('Please install `gh-pages` before deploying to GitHub Pages.')
-        }
-      }
-
-      if (isGhPagesInstalled) {
-        const { publish } = await import('gh-pages')
-        await publish('dist', {
-          branch: 'gh-pages',
-          message: 'chore: deploy by valaxy',
-        })
-
-        outro('Done!')
-      }
+    const options = {
+      dryRun: false,
+      forceUpload: sftpConfig.forceUpload || false,
+      excludeMode: 'remove' as const,
+      concurrency: 100,
     }
-  })
+
+    try {
+      // 使用 sftp.deploy 方法进行部署
+      await deploy(config, options)
+      consola.success('Deployment completed successfully.')
+    }
+    catch (error) {
+      consola.error('Deployment failed.')
+      consola.error(error)
+    }
+  }
+  else {
+    consola.info('No dist directory found, nothing to deploy.')
+  }
+}
+
+export function registerDeployCommand(cli: yargs.Argv) {
+  cli.command(
+    'deploy',
+    'Deploy the dist folder to remote server',
+    () => { },
+    async () => {
+      await deployDist()
+    },
+  )
 }

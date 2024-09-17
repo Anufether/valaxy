@@ -67,6 +67,7 @@
   },
   "dependencies": {
     "@valaxyjs/devtools": "workspace:*",
+    "sftp-sync-deploy": "^0.7.1",
     "valaxy": "workspace:*",
     "valaxy-addon-algolia": "workspace:*",
     "valaxy-addon-components": "workspace:*",
