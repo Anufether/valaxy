@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - "v*.*.*" # 匹配所有符合 vX.X.X 形式的标签
+      - "v*.*.*"
   pull_request:
     branches:
       - main
@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # 确保完整的历史记录被检出，以便生成变更日志
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -32,7 +32,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
-          registry-url: https://registry.npmjs.org/
+          registry-url: https://npm.pkg.github.com/
           cache: pnpm
 
       - name: Install dependencies
@@ -44,7 +44,7 @@ jobs:
       - name: Publish package
         run: pnpm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update changelog
         run: npx changelogithub
