@@ -20,7 +20,7 @@
 
 - **English** | [简体中文](./README.zh-CN.md)
 - [English Docs](https://valaxy.site/?lang=en) | [中文文档](https://valaxy.site/?lang=zh-CN) | [Docs for Beta](https://beta.valaxy.site)
-- [Demo](https://yun.valaxy.site): <small>with [valaxy-theme-yun](./packages/valaxy-theme-yun/)</small>
+- [Demo](https://yun.valaxy.site): `<small>`with [valaxy-theme-yun](./packages/valaxy-theme-yun/)`</small>`
 
 ## Usage
 
@@ -86,7 +86,7 @@ Want to create your theme? Check [valaxy-theme-starter](https://github.com/YunYo
 
 ❤️ Special thanks to the following sponsors for their support.
 
-<p align="center">
+ <p align="center">
   <a href="https://sponsors.yunyoujun.cn">
     <img src='https://fastly.jsdelivr.net/gh/YunYouJun/sponsors/public/sponsors.svg'/>
   </a>
