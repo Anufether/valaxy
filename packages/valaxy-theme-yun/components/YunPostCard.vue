@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
 import type { Post } from 'valaxy'
-import type { StyleValue } from 'vue'
 import { usePostProperty } from '../composables'
 
 const props = defineProps<{
@@ -14,7 +13,12 @@ const { icon, styles } = usePostProperty(props.post.type)
 </script>
 
 <template>
-  <YunCard m="y-4 auto" :class="post.cover ? 'post-card-image' : 'post-card'" overflow="hidden" :style="styles as StyleValue">
+  <YunCard
+    class="w-full"
+    m="auto"
+    :class="post.cover ? 'post-card-image' : 'post-card'"
+    overflow="hidden" :style="styles"
+  >
     <div class="flex flex-1 of-hidden justify-start items-start post-card-info" w="full">
       <img
         v-if="post.cover"
@@ -48,12 +52,12 @@ const { icon, styles } = usePostProperty(props.post.type)
         </div>
         <!-- <div m="b-5" /> -->
 
-        <div v-if="post.excerpt" w="full" h="10" class="absolute bottom-0 bg-gradient-to-t from-$va-c-bg-light to-transparent z-1" />
+        <YunExcerptBottomGradient v-if="post.excerpt" />
 
         <a
           v-if="post.url"
           :href="post.url"
-          class="post-link-btn shadow hover:shadow-md"
+          class="post-link-btn shadow hover:shadow-md z-2"
           rounded
           target="_blank"
           m="b-4"
@@ -67,7 +71,7 @@ const { icon, styles } = usePostProperty(props.post.type)
     <div
       w="full" class="yun-card-actions flex justify-between"
       min-h="10"
-      border="t" text="sm"
+      text="sm"
     >
       <div class="post-categories inline-flex" flex="wrap 1" items="center">
         <YunPostCategories m="l-1" :categories="post.categories" />
@@ -77,3 +81,28 @@ const { icon, styles } = usePostProperty(props.post.type)
     </div>
   </YunCard>
 </template>
+
+<style lang="scss">
+.post-card {
+  // safari not support
+  // animation: card-appear 0.6s ease-in-out forwards, card-appear 0.6s ease-in-out forwards reverse;
+  // animation-timeline: view();
+  // animation-range: entry, exit;
+}
+
+@keyframes card-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.yun-card-actions {
+  border-top: 1px solid rgb(122 122 122 / 0.05);
+}
+</style>

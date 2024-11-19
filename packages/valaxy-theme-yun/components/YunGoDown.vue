@@ -1,18 +1,13 @@
 <script lang="ts" setup>
-function goDown() {
-  const banner = document.getElementById('yun-banner')
-  if (banner) {
-    window.scrollTo({
-      top: banner.clientHeight,
-      behavior: 'smooth',
-    })
-  }
-}
+import { goDown } from '../utils'
 </script>
 
 <template>
-  <button class="go-down" aria-label="go-down" @click="goDown">
-    <div i-ri-arrow-down-s-line inline-flex />
+  <button
+    class="go-down w-20 bottom-0 text-sm md:(bottom-2 text-40px)" aria-label="go-down"
+    @click="goDown"
+  >
+    <div i-ri-arrow-down-s-fill inline-flex />
   </button>
 </template>
 
@@ -23,11 +18,9 @@ function goDown() {
   justify-content: center;
   align-items: center;
   position: absolute;
-  bottom: 1rem;
   z-index: var(--yun-z-go-down);
   animation: float 2s ease-in-out infinite;
-  font-size: 2.5rem;
-  color: var(--va-c-primary);
+  color: var(--va-c-text);
   transition: color var(--va-transition-duration);
 
   &:hover {
@@ -43,7 +36,7 @@ function goDown() {
 
   50% {
     opacity: 0.8;
-    transform: translateY(-0.8rem);
+    transform: translateY(-0.3em);
   }
 
   100% {

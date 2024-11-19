@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { defineWebPage, useSchemaOrg } from '@unhead/schema-org'
 import { useFrontmatter, usePostTitle, useSiteStore } from 'valaxy'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -15,28 +16,38 @@ useSchemaOrg([
     '@type': 'CollectionPage',
   }),
 ])
+
+const pageIcon = computed(() => {
+  if (!frontmatter.value.icon)
+    // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+    frontmatter.value.icon = 'i-ri-archive-line'
+  return frontmatter.value.icon
+})
 </script>
 
 <template>
-  <YunSidebar v-if="$slots['sidebar-child']">
-    <slot name="sidebar-child" />
-  </YunSidebar>
-  <YunSidebar v-else />
+  <YunLayoutWrapper>
+    <YunLayoutLeft />
 
-  <RouterView v-slot="{ Component }">
-    <component :is="Component">
-      <template #main-header>
-        <YunPageHeader
-          :title="title || t('menu.archives')"
-          :icon="frontmatter.icon || 'i-ri-archive-line'"
-          :color="frontmatter.color"
-          :page-title-class="frontmatter.pageTitleClass"
-        />
-      </template>
-      <template #main-content>
-        <RouterView />
-        <YunPostCollapse :posts="site.postList" />
-      </template>
-    </component>
-  </RouterView>
+    <RouterView v-slot="{ Component }">
+      <component :is="Component">
+        <template #main-header>
+          <YunPageHeader
+            :title="title || t('menu.archives')"
+            :icon="pageIcon"
+            :color="frontmatter.color"
+            :page-title-class="frontmatter.pageTitleClass"
+          />
+        </template>
+        <template #main-content>
+          <RouterView />
+          <YunPostCollapse :posts="site.postList" />
+        </template>
+      </component>
+    </RouterView>
+
+    <YunLayoutRight />
+  </YunLayoutWrapper>
+
+  <YunFooter />
 </template>

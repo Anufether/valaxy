@@ -18,10 +18,13 @@ const sponsorBtnTitle = computed(() => {
       class="sponsor-button yun-icon-btn shadow hover:shadow-md"
       :title="sponsorBtnTitle" text="red-400" @click="showQr = !showQr"
     >
-      <div i-ri-heart-line />
+      <div class="mt-2px" i-ri-heart-fill />
     </button>
 
-    <div class="qrcode-container qrcode flex-center flex-col" m="y-4" :class="showQr && 'show'">
+    <div
+      class="qrcode-container qrcode flex-center flex-col" m="y-4"
+      :class="showQr && 'show'"
+    >
       <div v-if="siteConfig.sponsor.description" class="sponsor-description" mb="4" text="sm">
         {{ siteConfig.sponsor.description }}
       </div>
@@ -41,10 +44,12 @@ const sponsorBtnTitle = computed(() => {
 </template>
 
 <style lang="scss">
+@use 'sass:map';
+@use 'valaxy-theme-yun/styles/vars.scss' as *;
 @use "valaxy/client/styles/mixins/index.scss" as *;
 
 .sponsor-button {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgb(255 255 255 / 0.1);
 
   div {
     transform: scale(1.1);
@@ -52,7 +57,7 @@ const sponsorBtnTitle = computed(() => {
   }
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgb(255 255 255 / 0.9);
 
     div {
       transform: scale(1.2);
@@ -67,12 +72,22 @@ const sponsorBtnTitle = computed(() => {
 }
 
 .qrcode-container {
+  --height: 200px;
+
   overflow: hidden;
   height: 0;
-  transition: height var(--va-transition-duration) ease-in-out;
+  opacity: 0;
+  transition: all var(--va-transition-duration) map.get($cubic-bezier, 'ease-in-out');
 
   &.show {
-    height: 260px;
+    height: var(--height);
+    opacity: 1;
+  }
+}
+
+@include screen('md') {
+  .qrcode-container {
+    --height: 260px;
   }
 }
 

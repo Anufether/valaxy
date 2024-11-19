@@ -49,11 +49,15 @@ npm run build
 
 第三方部署的各配置文件已内置在 Valaxy 的初始化模版项目中，您可以按需使用。
 
+如果部署失败，推荐您先在本地通过 `npm run build` 检查潜在的构建错误。
+
 </div>
 
 <div lang="en">
 
 The configuration files for the following third-party deployments are built into the Valaxy template project. You can use them as needed.
+
+If the deployment fails, we recommend that you first check for potential build errors locally using `npm run build`.
 
 </div>
 
@@ -62,6 +66,36 @@ The configuration files for the following third-party deployments are built into
 ### GitHub Pages
 
 <BrandIcon icon="i-logos:github-icon" link="https://pages.github.com/" />
+
+::: tip
+
+<div lang="zh-CN">
+
+当您使用 GitHub Pages 托管时，请确保您的仓库名为 `你的用户名.github.io`。
+
+这是因为当存在同名目录时，GitHub Pages 会默认为您分配 `你的用户名.github.io` 作为你的个人域名。
+
+> 尽管您也可以将其重命名为其他名称，并设置自定义域名等。（更多的进阶操作，可自行搜索。）  
+> 但作为新手，我更推荐您遵循默认规则，以避免意想不到的错误。
+
+</div>
+
+<div lang="en">
+
+When you use GitHub Pages for hosting, make sure your repository name is `your-username.github.io`.
+
+This is because when there is a directory with the same name, GitHub Pages will default to assigning `your-username.github.io` as your personal domain.
+
+> Although you can rename it to other names and set custom domains, etc. (For more advanced operations, you can search by yourself.)  
+> But as a beginner, I recommend you follow the default rules to avoid unexpected errors.
+
+</div>
+
+:::
+
+::: details .github/workflows/gh-pages.yml
+<<< @/../packages/create-valaxy/template-blog/.github/workflows/gh-pages.yml
+:::
 
 ::: zh-CN
 在使用 `pnpm create valaxy` 创建模版项目时，已内置文件[`.github/workflows/gh-pages.yml`](https://github.com/YunYouJun/valaxy/blob/main/packages/create-valaxy/template-blog/.github/workflows/gh-pages.yml) 以实现 GitHub Actions 的自动部署工作流。
@@ -131,33 +165,31 @@ When you use `pnpm create valaxy` to create a template project, it contains the 
 - Wait for ribbons to drop on the screen, then visit your website.
 :::
 
+::: details netlify.toml
+<<< @/../packages/create-valaxy/template-blog/netlify.toml
+:::
+
 ### Cloudflare Pages
 
 <BrandIcon icon="i-logos:cloudflare-icon" link="https://pages.cloudflare.com/" />
 
 ::: zh-CN
 
-- 登录你的 Cloudflare 账号，导航到 “Pages” 页面。
+- 登录你的 [Cloudflare](https://www.cloudflare-cn.com/) 账号，从侧边栏导航至 “Workers 和 Pages” 页面。
 - 点击 `创建项目`、`连接到 Git`，选择你的 GitHub 或者 GitLab 仓库，并点击 `开始设置`。
 - 选择你的部署分支。
-- 将 `构建命令` 设置为 `npm run build` 。
-- 将 `构建输出目录` 设置为 `dist` 后添加一个环境变量。
-
-> `NODE_VERSION`: `16` （设置 Node 版本）
-
+- 将 `构建命令` 设置为 `pnpm build` 。
+- 将 `构建输出目录` 设置为 `dist` 。
 - 点击 `保存并部署`。
 :::
 
 ::: en
 
-- Login to your Cloudflare account and navigate to "Pages" page.
+- Login to your Cloudflare account and navigate to "Workers and Pages" page.
 - Click `Create a project` and `Connect to Git`, then select your GitHub or GitLab repository and click `Begin setup`.
 - Select your Production branch.
-- Set `Build output directory` to `npm run build` .
-- Set `Build output directory` to `dist` and add an environment variable.
-
-> `NODE_VERSION`: `16` (Set Node version)
-
+- Set `Build output directory` to `pnpm build` .
+- Set `Build output directory` to `dist` .
 - Then click "Save and Deploy".
 :::
 
@@ -176,6 +208,8 @@ When you use `pnpm create valaxy` to create a template project, it contains the 
 Here is an example of an Nginx server block configuration `nginx.conf`. This configuration includes rules for gzip compression of common text-based resources, serving static files for a Valaxy site with appropriate caching headers, and handling `cleanUrls: true`.
 
 :::
+
+::: details nginx.conf
 
 ```nginx
 server {
@@ -210,6 +244,8 @@ server {
 }
 ```
 
+:::
+
 ::: zh-CN
 
 本配置默认已构建的 Valaxy 站点位于服务器上的 `/usr/share/nginx/html` 目录中。如果站点文件位于其他位置，请相应调整 `root` 指令。
@@ -242,6 +278,8 @@ Refer to the Nginx section for the `nginx.conf` configuration and place it in th
 
 :::
 
+::: details Dockerfile
+
 ```Dockerfile
 FROM node:20-alpine as build-stage
 
@@ -263,6 +301,8 @@ EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
 ```
+
+:::
 
 ### 其他 {lang="zh-CN"}
 

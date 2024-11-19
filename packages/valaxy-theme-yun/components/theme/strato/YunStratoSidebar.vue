@@ -1,33 +1,36 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useYunAppStore } from '../stores'
+import { useYunAppStore } from '../../../stores'
 
 defineProps<{
   showHamburger?: boolean
 }>()
 
-const yunStore = useYunAppStore()
+const yun = useYunAppStore()
 const showOverview = ref(false)
 </script>
 
 <template>
-  <ValaxyOverlay class="md:hidden" :show="yunStore.leftSidebar.isOpen" @click="yunStore.leftSidebar.toggle()" />
+  <!-- class="md:hidden"  -->
+  <YunOverlay :show="yun.leftSidebar.isOpen" @click="yun.leftSidebar.toggle()" />
 
-  <ValaxyHamburger
+  <!-- <ValaxyHamburger
     :active="yunStore.leftSidebar.isOpen"
     class="menu-btn sidebar-toggle yun-icon-btn leading-4 fixed left-0.8rem top-0.6rem"
     inline-flex cursor="pointer" z="$yun-z-menu-btn"
     :class="showHamburger ? '' : 'md:hidden'"
     @click="yunStore.leftSidebar.toggle()"
-  />
+  /> -->
 
   <aside
-    class="va-card transition sidebar fixed inset-y-0 left-0 overflow-y-auto"
+    id="yun-left-sidebar"
+    class="va-card transition yun-sidebar fixed inset-y-0 left-0 overflow-y-auto"
     :class="{
-      'open': yunStore.leftSidebar.isOpen,
+      'open': yun.leftSidebar.isOpen,
       'md:translate-x-0': !showHamburger,
     }"
-    text="center" bg="$yun-sidebar-bg-color contain no-repeat" z="$yun-z-sidebar"
+    text="center" bg="$yun-sidebar-bg-color contain no-repeat"
+    z="$yun-z-left-sidebar"
   >
     <div v-if="$slots.default" class="sidebar-nav" m="t-6">
       <button
@@ -55,30 +58,33 @@ const showOverview = ref(false)
 </template>
 
 <style lang="scss">
-.sidebar {
+@use 'sass:map';
+@use 'valaxy-theme-yun/styles/vars.scss' as *;
+
+#yun-left-sidebar {
   width: calc(100vw - 64px);
   max-width: var(--va-sidebar-width);
   background-image: var(--yun-sidebar-bg-img);
   background-position: bottom 1rem center;
   transform: translateX(-100%);
   transition: box-shadow var(--va-transition-duration),
-    background-color var(--va-transition-duration), opacity 0.25s,
-    transform var(--va-transition-duration) cubic-bezier(0.19, 1, 0.22, 1) !important;
+    background-color var(--va-transition-duration), opacity var(--va-transition-duration),
+    transform var(--va-transition-duration) map.get($cubic-bezier, 'ease-in-out') !important;
 
   &.open {
     transform: translateX(0);
   }
-}
 
-.sidebar-nav {
-  .sidebar-nav-item {
-    color: var(--va-c-primary);
-    border: 1px solid var(--va-c-primary);
-
-    &.active {
+  .sidebar-nav {
+    .sidebar-nav-item {
+      color: var(--va-c-primary);
       border: 1px solid var(--va-c-primary);
-      color: white;
-      background-color: var(--va-c-primary);
+
+      &.active {
+        border: 1px solid var(--va-c-primary);
+        color: white;
+        background-color: var(--va-c-primary);
+      }
     }
   }
 }

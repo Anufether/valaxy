@@ -4,6 +4,8 @@ import type { ThemeConfig, UserThemeConfig } from '../types'
  * Default Config
  */
 export const defaultThemeConfig: ThemeConfig = {
+  type: 'nimbo',
+
   valaxyDarkOptions: {
     circleTransition: true,
   },
@@ -15,9 +17,6 @@ export const defaultThemeConfig: ThemeConfig = {
   banner: {
     enable: true,
     title: '云游君的小站',
-    cloud: {
-      enable: true,
-    },
   },
 
   bg_image: {
@@ -27,7 +26,7 @@ export const defaultThemeConfig: ThemeConfig = {
   },
 
   say: {
-    enable: true,
+    enable: false,
     api: '',
     // api: 'https://el-bot-api.elpsy.cn/api/words/young',
     hitokoto: {
@@ -95,8 +94,8 @@ export const defaultThemeConfig: ThemeConfig = {
       icon: 'i-simple-icons-notion',
     },
     'twitter': {
-      color: '#1da1f2',
-      icon: 'i-ri-twitter-line',
+      color: 'black',
+      icon: 'i-ri-twitter-x-fill',
     },
     'wechat': {
       color: '#1AAD19',

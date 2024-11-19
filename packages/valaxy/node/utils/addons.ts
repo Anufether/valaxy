@@ -47,10 +47,10 @@ export async function parseAddons(addons: ValaxyAddons, userRoot = process.cwd()
  * @param options
  */
 export async function readAddonModule(name: string, options: ReadAddonModuleOptions = {}) {
-  const root = getAddonRoot(name, options.cwd || process.cwd())
+  const root = await getAddonRoot(name, options.cwd || process.cwd())
 
   const packageJSONPath = resolve(root, './package.json')
-  if (!fs.existsSync(packageJSONPath)) {
+  if (!await fs.exists(packageJSONPath)) {
     logger.error(`No addon named ${name} found`)
     return
   }
@@ -73,7 +73,7 @@ export async function readAddonModule(name: string, options: ReadAddonModuleOpti
  * @param name valaxy-addon-name
  * @param entry
  */
-export function getAddonRoot(name: string, entry?: string) {
+export async function getAddonRoot(name: string, entry?: string) {
   const addonModule = (name.startsWith('valaxy-addon') || name.startsWith('.')) ? name : `valaxy-addon-${name}`
-  return getModuleRoot(addonModule, entry)
+  return await getModuleRoot(addonModule, entry)
 }

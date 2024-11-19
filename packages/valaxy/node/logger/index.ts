@@ -1,14 +1,25 @@
 import consola from 'consola'
+import { colors } from 'consola/utils'
+import ora from 'ora'
 import { magenta } from 'picocolors'
-import { isProd } from '../utils/env'
+import type { HookKeys } from 'hookable'
+import type { ValaxyHooks, ValaxyNode } from '../types'
 
-export const logger = consola.create({
-  level: isProd() ? 2 : 3,
-})
+export const logger = consola.create({})
 
-const prefix = `${magenta('valaxy')}:`
+export const valaxyPrefix = colors.magenta('[valaxy]')
 export const vLogger = {
-  success: (args: any) => logger.success(prefix, args),
-  info: (args: any) => logger.info(prefix, args),
-  ready: (args: any) => logger.ready(prefix, args),
+  success: (...args: any) => logger.success(valaxyPrefix, ...args),
+  info: (...args: any) => logger.info(valaxyPrefix, ...args),
+  ready: (...args: any) => logger.ready(valaxyPrefix, ...args),
+}
+
+/**
+ * log for hook run
+ */
+export async function callHookWithLog(hookName: HookKeys<ValaxyHooks>, valaxyApp: ValaxyNode) {
+  const hookNameStr = `${colors.cyan('[HOOK]')} ${magenta(hookName)}`
+  const s = ora(`${hookNameStr} calling...`).start()
+  await valaxyApp.hooks.callHook(hookName)
+  s.succeed(`${hookNameStr} done.`)
 }

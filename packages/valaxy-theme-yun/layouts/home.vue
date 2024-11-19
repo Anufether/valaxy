@@ -1,13 +1,12 @@
 <script lang="ts" setup>
-import { useLayout } from 'valaxy'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { useYunAppStore } from '../stores'
 import { useThemeConfig } from '../composables'
+import { useYunAppStore } from '../stores'
 
-const yunStore = useYunAppStore()
+const yun = useYunAppStore()
+
 const route = useRoute()
-const isHome = useLayout('home')
 const themeConfig = useThemeConfig()
 
 const isPage = computed(() => route.path.startsWith('/page'))
@@ -19,20 +18,25 @@ const showNotice = computed(() => {
 </script>
 
 <template>
-  <main
-    class="yun-main flex-center"
-    :class="(isHome && !yunStore.leftSidebar.isOpen) ? 'pl-0' : 'md:pl-$va-sidebar-width'" flex="~ col" w="full"
+  <YunLayoutWrapper
+    class="items-center flex-col"
+    :class="{
+      'mt-0!': !isPage,
+    }"
   >
-    <YunSidebar :show-hamburger="true" />
-
     <template v-if="!isPage">
-      <YunBanner v-if="themeConfig.banner.enable" />
+      <YunBanner />
       <YunSay v-if="themeConfig.say.enable" w="full" />
+      <YunPrologue v-if="yun.isNimbo" class="absolute left-0 top-0 right-0 bottom-0" />
     </template>
 
     <YunNotice
       v-if="showNotice"
-      :content="themeConfig.notice.content" mt="4"
+      class="mb-2 md:mb-6"
+      :class="{
+        'mt-4': !isPage,
+      }"
+      :content="themeConfig.notice.content"
     />
 
     <slot name="board" />
@@ -40,7 +44,6 @@ const showNotice = computed(() => {
     <slot>
       <RouterView />
     </slot>
-
-    <YunFooter />
-  </main>
+  </YunLayoutWrapper>
+  <YunFooter />
 </template>

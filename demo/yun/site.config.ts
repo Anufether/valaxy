@@ -6,7 +6,10 @@ export default defineSiteConfig({
   },
 
   lang: 'zh-CN',
-  title: 'Valaxy Theme Yun',
+  // disable show language switch
+  // languages: ['zh-CN'],
+
+  title: '自定义博客名称',
   timezone: 'Asia/Shanghai',
   url: 'https://yun.valaxy.site/',
   author: {
@@ -72,8 +75,8 @@ export default defineSiteConfig({
     {
       name: 'Twitter',
       link: 'https://twitter.com/YunYouJun',
-      icon: 'i-ri-twitter-line',
-      color: '#1da1f2',
+      icon: 'i-ri-twitter-x-fill',
+      color: 'black',
     },
     {
       name: 'Telegram Channel',
@@ -91,7 +94,7 @@ export default defineSiteConfig({
       name: 'Travelling',
       link: 'https://www.travellings.cn/go.html',
       icon: 'i-ri-train-line',
-      color: 'var(--va-c-text)',
+      color: '#8cb1b3',
     },
   ],
 

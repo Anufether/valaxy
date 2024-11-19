@@ -44,10 +44,12 @@ const sortedYears = computed(() => {
 </script>
 
 <template>
-  <div class="post-collapse px-10 lt-sm:px-5" relative>
-    <div w="full" text="center" class="yun-text-light" p="2">
-      {{ t('counter.archives', posts.length) }}
-    </div>
+  <div class="post-collapse px-10 lt-sm:px-5 max-w-3xl" relative>
+    <Transition appear enter-active-class="animate-fade-in animate-duration-400">
+      <div w="full" text="center" class="yun-text-light" p="2">
+        {{ t('counter.archives', posts.length) }}
+      </div>
+    </Transition>
 
     <div class="post-collapse-action" text="center">
       <button class="yun-icon-btn shadow hover:shadow-md" @click="isDesc = !isDesc">
@@ -63,23 +65,12 @@ const sortedYears = computed(() => {
         </h2>
       </div>
 
-      <article
-        v-for="post, j in sortByDate(postListByYear[year], isDesc)" :key="j"
-        class="post-item" relative
-      >
-        <header class="post-header" flex items-center relative>
-          <div class="post-meta">
-            <time v-if="post.date" class="post-time" font="mono" opacity="80">{{
-              formatDate(post.date, 'MM-dd') }}
-            </time>
-          </div>
-          <h2 class="post-title" inline-flex items-center font="serif black">
-            <RouterLink :to="post.path || ''" class="post-title-link">
-              {{ post.title }}
-            </RouterLink>
-          </h2>
-        </header>
-      </article>
+      <YunPostCollapseItem
+        v-for="post, j in sortByDate(postListByYear[year], isDesc)"
+        :key="j"
+        :post="post"
+        :i="j"
+      />
     </div>
   </div>
 </template>
@@ -114,60 +105,6 @@ const sortedYears = computed(() => {
         background: var(--va-c-primary);
         border-radius: 50%;
       }
-    }
-  }
-
-  .post-item {
-    &::before {
-      content: '';
-      position: absolute;
-      width: 2px;
-      height: 100%;
-      background: rgba(var(--va-c-primary-rgb), 0.3);
-    }
-  }
-
-  .post-header {
-    border-bottom: 1px solid rgba(var(--va-c-primary-rgb), 0.3);
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      width: 10px;
-      height: 10px;
-      margin-left: -4px;
-      border-radius: 50%;
-      border: 1px solid var(--va-c-primary);
-      background-color: var(--va-c-bg-light);
-      z-index: 1;
-      transition: background var(--va-transition-duration);
-    }
-
-    &:hover {
-      &::before {
-        background: var(--va-c-primary);
-      }
-    }
-
-    .post-title {
-      margin-left: 0.1rem;
-      padding: 0;
-      font-size: 1rem;
-
-      .post-title-link {
-        .icon {
-          width: 1.1rem;
-          height: 1.1rem;
-          margin-right: 0.3rem;
-        }
-      }
-    }
-
-    .post-meta {
-      font-size: 1rem;
-      margin: 1rem 0 1rem 1.2rem;
-      white-space: nowrap;
     }
   }
 }

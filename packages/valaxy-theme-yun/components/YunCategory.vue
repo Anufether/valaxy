@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import type { CategoryList, Post } from 'valaxy'
-import { isCategoryList, useInvisibleElement } from 'valaxy'
+import { useInvisibleElement } from 'valaxy'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useYunSpringAnimation } from '../composables/animation'
 
 const props = withDefaults(defineProps<{
+  i?: number
   parentKey: string
   // to eliminate the warning
   category: Post | CategoryList
@@ -20,23 +22,9 @@ const props = withDefaults(defineProps<{
 })
 
 const router = useRouter()
-const route = useRoute()
-const categoryList = computed(() => {
-  const c = (route.query.category as string) || ''
-  return Array.isArray(c) ? [c] : c.split('/')
-})
 
 const collapse = ref(props.collapsable)
 const { t } = useI18n()
-
-/**
- * i18n
- */
-const { locale } = useI18n()
-function getTitle(post: Post | any) {
-  const lang = locale.value === 'zh-CN' ? 'zh' : locale.value
-  return post[`title_${lang}`] ? post[`title_${lang}`] : post.title
-}
 
 const postCollapseElRef = ref<HTMLElement>()
 const { show } = useInvisibleElement(postCollapseElRef)
@@ -45,6 +33,8 @@ const { show } = useInvisibleElement(postCollapseElRef)
  * @param category
  */
 function jumpToDisplayCategory(category: string) {
+  collapse.value = false
+
   router.push({
     query: {
       category,
@@ -59,37 +49,64 @@ onMounted(() => {
   if (postCollapseEl)
     postCollapseElRef.value = postCollapseEl
 })
+
+const categoryRef = ref<HTMLElement>()
+if (props.level === 1) {
+  useYunSpringAnimation(categoryRef, {
+    i: props.i || 0,
+    y: 20,
+    duration: 200,
+  })
+}
 </script>
 
 <template>
-  <li class="category-list-item inline-flex items-center cursor-pointer">
-    <span class="folder-action inline-flex" @click="collapse = !collapse">
+  <li
+    ref="categoryRef"
+    class="category-list-item inline-flex items-center cursor-pointer w-full gap-2 px-3 py-2 rounded"
+    hover="bg-black/5"
+  >
+    <span
+      class="folder-action inline-flex"
+      hover="text-$va-c-primary-lighter"
+      @click="collapse = !collapse"
+    >
       <div v-if="collapse" i-ri-folder-add-line />
-      <div v-else style="color:var(--va-c-primary)" i-ri-folder-reduce-line />
+      <div v-else class="text-$va-c-primary dark:text-$va-c-primary-lighter" i-ri-folder-reduce-line />
     </span>
-    <span class="category-name" m="l-1" @click="jumpToDisplayCategory(parentKey)">
-      {{ category.name === 'Uncategorized' ? t('category.uncategorized') : category.name }} [{{ category.total }}]
+    <span
+      class="category-name inline-flex items-center gap-2 w-full"
+      @click="jumpToDisplayCategory(parentKey)"
+    >
+      <span>
+        {{ category.name === 'Uncategorized' ? t('category.uncategorized') : category.name }}
+      </span>
+      <span class="rounded-full px-1.5 bg-black/5 shadow-sm" text="xs black/55">
+        {{ category.total }}
+      </span>
     </span>
   </li>
 
-  <template v-if="!collapse">
-    <ul>
-      <li v-for="categoryItem, i in category.children.values()" :key="i" class="post-list-item" m="l-4">
-        <template v-if="isCategoryList(categoryItem)">
-          <YunCategory
-            :parent-key="parentKey ? `${parentKey}/${categoryItem.name}` : categoryItem.name"
-            :category="categoryItem"
-            :collapsable="!categoryList.includes(categoryItem.name)"
-          />
-        </template>
-
-        <template v-else>
-          <RouterLink v-if="categoryItem.title" :to="categoryItem.path || ''" class="inline-flex items-center">
-            <div i-ri-file-text-line />
-            <span m="l-1" font="serif black">{{ getTitle(categoryItem) }}</span>
-          </RouterLink>
-        </template>
+  <Transition
+    enter-active-class="v-enter-active"
+    enter-from-class="v-enter-from"
+    leave-active-class="v-leave-active"
+    leave-to-class="v-leave-to"
+    :duration="{ enter: 200, leave: 0 }"
+  >
+    <ul v-if="!collapse">
+      <li
+        v-for="categoryItem, cI in category.children.values()"
+        :key="cI"
+        class="post-list-item text-$va-c-text" m="l-4"
+        hover="text-$va-c-primary-lighter"
+      >
+        <YunCategoryChildItem
+          :i="cI"
+          :category-item="categoryItem"
+          :parent-key="parentKey"
+        />
       </li>
     </ul>
-  </template>
+  </Transition>
 </template>

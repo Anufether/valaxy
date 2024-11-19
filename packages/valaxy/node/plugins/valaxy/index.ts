@@ -6,7 +6,6 @@ import { join, relative, resolve } from 'pathe'
 import fs from 'fs-extra'
 
 import type { Plugin, ResolvedConfig } from 'vite'
-import { defu } from 'defu'
 import pascalCase from 'pascalcase'
 import type { DefaultTheme, Pkg, SiteConfig } from 'valaxy/types'
 import { dim, yellow } from 'picocolors'
@@ -22,6 +21,7 @@ import { countPerformanceTime } from '../../utils/performance'
 import { isProd } from '../../utils/env'
 import type { PageDataPayload } from '../../../types'
 import { createMarkdownToVueRenderFn } from '../markdown/markdownToVue'
+import { replaceArrMerge } from '../../config/merge'
 
 function generateConfig(options: ResolvedValaxyOptions) {
   const routes = options.redirects.map<RouteRecordRaw>((redirect) => {
@@ -42,12 +42,12 @@ function generateConfig(options: ResolvedValaxyOptions) {
  * for /@valaxyjs/styles
  * @param roots
  */
-function generateStyles(roots: string[], options: ResolvedValaxyOptions) {
+async function generateStyles(roots: string[], options: ResolvedValaxyOptions) {
   const imports: string[] = []
 
   // katex
   if (options.config.features?.katex) {
-    imports.push(`import "${toAtFS(resolveImportPath('katex/dist/katex.min.css', true))}"`)
+    imports.push(`import "${toAtFS(await resolveImportPath('katex/dist/katex.min.css', true))}"`)
     imports.push(`import "${toAtFS(join(options.clientRoot, 'styles/third/katex.scss'))}"`)
   }
 
@@ -178,7 +178,7 @@ export async function createValaxyLoader(options: ResolvedValaxyOptions, serverO
         return null
       },
 
-      load(id) {
+      async load(id) {
         if (id === '/@valaxyjs/config')
           // stringify twice for \"
           return generateConfig(options)
@@ -195,7 +195,7 @@ export async function createValaxyLoader(options: ResolvedValaxyOptions, serverO
 
         // generate styles
         if (id === '/@valaxyjs/styles')
-          return generateStyles(roots, options)
+          return await generateStyles(roots, options)
 
         if (id === '/@valaxyjs/locales')
           return generateLocales(roots)
@@ -279,7 +279,7 @@ export async function createValaxyLoader(options: ResolvedValaxyOptions, serverO
         // siteConfig
         if (file === options.siteConfigFile) {
           const { siteConfig } = await resolveSiteConfig(options.userRoot)
-          valaxyConfig.siteConfig = defu<SiteConfig, [SiteConfig]>(siteConfig, defaultSiteConfig)
+          valaxyConfig.siteConfig = replaceArrMerge<SiteConfig, [SiteConfig]>(siteConfig as SiteConfig, defaultSiteConfig)
           return reloadConfigAndEntries(valaxyConfig)
         }
 

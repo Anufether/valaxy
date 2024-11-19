@@ -1,8 +1,13 @@
-<template>
-  <YunSidebar v-if="$slots['sidebar-child']">
-    <slot name="sidebar-child" />
-  </YunSidebar>
-  <YunSidebar v-else />
+<script setup lang="ts">
+// layout
+</script>
 
-  <RouterView />
+<template>
+  <YunLayoutWrapper>
+    <YunLayoutLeft />
+    <RouterView />
+    <YunLayoutRight />
+  </YunLayoutWrapper>
+
+  <YunFooter />
 </template>

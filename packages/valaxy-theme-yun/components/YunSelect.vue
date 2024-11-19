@@ -22,7 +22,7 @@ function toggleOptionVisible(e: MouseEvent) {
 </script>
 
 <template>
-  <div class="relative h-8 w-30 text-$va-c-text-2 z-10" @mousedown.stop>
+  <div class="relative h-8 w-30 text-$va-c-text-2 z-$yun-z-select" @mousedown.stop>
     <button
       class="flex h-full w-full px-2 items-center justify-between rounded transition"
       border="~ gray op-30"
@@ -54,15 +54,5 @@ function toggleOptionVisible(e: MouseEvent) {
 <style lang="scss" scoped>
 .select-options {
   margin: 0;
-}
-
-.v-enter-active,
-.v-leave-active {
-  transition: opacity .2s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
 }
 </style>

@@ -14,6 +14,13 @@ const route = useRoute()
 const curCategory = computed(() => (route.query.category as string || ''))
 const categories = useCategories()
 
+const pageIcon = computed(() => {
+  if (!frontmatter.value.icon)
+    // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+    frontmatter.value.icon = 'i-ri-folder-2-line'
+  return frontmatter.value.icon
+})
+
 const posts = computed(() => {
   const list = site.postList.filter((post) => {
     if (post.categories && curCategory.value !== 'Uncategorized') {
@@ -39,38 +46,47 @@ useSchemaOrg([
 </script>
 
 <template>
-  <YunSidebar v-if="$slots['sidebar-child']">
-    <slot name="sidebar-child" />
-  </YunSidebar>
-  <YunSidebar v-else />
+  <YunLayoutWrapper>
+    <YunLayoutLeft />
 
-  <RouterView v-slot="{ Component }">
-    <component :is="Component">
-      <template #main-header>
-        <YunPageHeader
-          :title="title || t('menu.categories')"
-          :icon="frontmatter.icon || 'i-ri-folder-2-line'"
-          :color="frontmatter.color"
-          :page-title-class="frontmatter.pageTitleClass"
-        />
-      </template>
-      <template #main-content>
-        <div text="center" class="yun-text-light" p="2">
-          {{ t('counter.categories', Array.from(categories.children).length) }}
-        </div>
-        <YunCategories :categories="categories.children" />
-        <RouterView />
-      </template>
-
-      <template #main-nav-before>
-        <YunCard v-if="curCategory" class="post-collapse-container" m="t-4" w="full">
+    <RouterView v-slot="{ Component }">
+      <component :is="Component">
+        <template #main-header>
           <YunPageHeader
-            :title="curCategory === 'Uncategorized' ? t('category.uncategorized') : curCategory.split('/').join(' / ')"
-            icon="i-ri-folder-open-line"
+            :title="title || t('menu.categories')"
+            :icon="pageIcon"
+            :color="frontmatter.color"
+            :page-title-class="frontmatter.pageTitleClass"
           />
-          <YunPostCollapse w="full" m="b-4" p="x-20 lt-sm:x-5" :posts="posts" />
-        </YunCard>
-      </template>
-    </component>
-  </RouterView>
+        </template>
+        <template #main-content>
+          <Transition
+            enter-active-class="animate-fade-in animate-duration-400"
+            appear
+          >
+            <div text="center" class="yun-text-light" p="2">
+              {{ t('counter.categories', Array.from(categories.children).length) }}
+            </div>
+          </Transition>
+          <YunCategories :categories="categories.children" />
+          <RouterView />
+        </template>
+
+        <template #main-nav-before>
+          <YunCard v-if="curCategory" class="post-collapse-container" m="t-4" w="full">
+            <YunPageHeader
+              m="t-10"
+              :title="curCategory === 'Uncategorized' ? t('category.uncategorized') : curCategory.split('/').join(' / ')"
+              icon="i-ri-folder-open-line"
+            />
+            <YunPostCollapse w="full" m="b-4" p="x-20 lt-sm:x-5" :posts="posts" />
+          </YunCard>
+        </template>
+      </component>
+    </RouterView>
+
+    <YunLayoutRight />
+  </YunLayoutWrapper>
+
+  <YunFooter />
 </template>

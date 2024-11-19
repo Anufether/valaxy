@@ -1,11 +1,10 @@
 import { dirname, join, resolve } from 'node:path'
 import type { Alias, AliasOptions, InlineConfig, Plugin } from 'vite'
 import { mergeConfig, searchForWorkspaceRoot } from 'vite'
-import isInstalledGlobally from 'is-installed-globally'
 import { uniq } from '@antfu/utils'
 import { getIndexHtml } from '../common'
 import type { ResolvedValaxyOptions } from '../options'
-import { resolveImportPath, toAtFS } from '../utils'
+import { isInstalledGlobally, resolveImportPath, toAtFS } from '../utils'
 
 /**
  * dependencies used by client
@@ -66,14 +65,14 @@ const EXCLUDE = [
 ]
 
 export function createConfigPlugin(options: ResolvedValaxyOptions): Plugin {
-  const themeDeps = Object.keys((options.config.themeConfig.pkg.dependencies || {}))
+  // const themeDeps = Object.keys((options.config.themeConfig.pkg.dependencies || {}))
   const addonDeps = options.addons.map(i => Object.keys(i.pkg.dependencies || {})).flat()
 
   return {
     name: 'valaxy:site',
     // before devtools
     enforce: 'pre',
-    config(config) {
+    async config(config) {
       const injection: InlineConfig = {
         // root: options.userRoot,
         // can not transform valaxy/client/*.ts when use userRoot
@@ -83,7 +82,7 @@ export function createConfigPlugin(options: ResolvedValaxyOptions): Plugin {
 
         define: getDefine(options),
         resolve: {
-          alias: getAlias(options),
+          alias: await getAlias(options),
           dedupe: ['vue'],
         },
 
@@ -94,8 +93,8 @@ export function createConfigPlugin(options: ResolvedValaxyOptions): Plugin {
           // must need it
           include: uniq([
             ...clientDeps,
-            // theme deps
-            ...themeDeps,
+            // remove theme deps, for primevue parse entry
+            // ...themeDeps,
             // addon deps
             ...addonDeps,
           ]).filter(i => !EXCLUDE.includes(i)),
@@ -109,7 +108,7 @@ export function createConfigPlugin(options: ResolvedValaxyOptions): Plugin {
               searchForWorkspaceRoot(options.clientRoot),
               searchForWorkspaceRoot(options.themeRoot),
               searchForWorkspaceRoot(options.userRoot),
-              dirname(resolveImportPath('katex/package.json', true)),
+              dirname(await resolveImportPath('katex/package.json', true)),
             ]),
           },
         },
@@ -148,7 +147,7 @@ export function getDefine(_options: ResolvedValaxyOptions): Record<string, any> 
   }
 }
 
-export function getAlias(options: ResolvedValaxyOptions): AliasOptions {
+export async function getAlias(options: ResolvedValaxyOptions): Promise<AliasOptions> {
   const alias: Alias[] = [
     { find: '~/', replacement: `${toAtFS(options.userRoot)}/` },
     { find: 'valaxy/client/', replacement: `${toAtFS(options.clientRoot)}/` },
@@ -157,6 +156,7 @@ export function getAlias(options: ResolvedValaxyOptions): AliasOptions {
     { find: '@valaxyjs/client/', replacement: `${toAtFS(options.clientRoot)}/` },
     // virtual module to import theme
     { find: 'virtual:valaxy-theme', replacement: `${toAtFS(options.themeRoot)}/client/index.ts` },
+    { find: `valaxy-theme-${options.theme}/client`, replacement: `${toAtFS(resolve(options.themeRoot))}/client/index.ts` },
     { find: `valaxy-theme-${options.theme}/`, replacement: `${toAtFS(resolve(options.themeRoot))}/` },
     { find: `valaxy-theme-${options.theme}`, replacement: `${toAtFS(resolve(options.themeRoot))}/client/index.ts` },
   ]
@@ -165,7 +165,7 @@ export function getAlias(options: ResolvedValaxyOptions): AliasOptions {
   // type cast
   if (options.config.siteConfig.encrypt.enable) {
     alias.push(
-      { find: /^vue$/, replacement: resolveImportPath('vue/dist/vue.esm-bundler.js', true) },
+      { find: /^vue$/, replacement: await resolveImportPath('vue/dist/vue.esm-bundler.js', true) },
     )
   }
 

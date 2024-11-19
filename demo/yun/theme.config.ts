@@ -1,6 +1,8 @@
 import { defineThemeConfig } from 'valaxy-theme-yun'
 
 export default defineThemeConfig({
+  // type: 'strato',
+  type: 'nimbo',
   // colors: {
   //   primary: 'red',
   // },
@@ -16,18 +18,43 @@ export default defineThemeConfig({
     content: '公告测试',
   },
 
+  nav: [
+    {
+      text: '导航',
+      link: '/projects',
+      items: [
+        { text: '项目列表', link: '/projects' },
+        { text: '友情链接', link: '/links' },
+        { text: '老婆列表', link: '/girls' },
+        { text: '赞助者', link: 'https://sponsors.yunyoujun.cn' },
+      ],
+    },
+  ],
+
   pages: [
     {
-      name: '我的小伙伴们',
-      url: '/links/',
-      icon: 'i-ri-genderless-line',
-      color: 'dodgerblue',
+      name: '项目列表',
+      url: '/projects',
+      icon: 'i-ri-gallery-view',
+      color: 'var(--va-c-text)',
     },
     {
-      name: '喜欢的女孩子',
+      name: '友情链接',
+      url: '/links/',
+      icon: 'i-ri-link',
+      // color: 'dodgerblue',
+    },
+    {
+      name: '老婆列表',
       url: '/girls/',
       icon: 'i-ri-women-line',
-      color: 'hotpink',
+      // color: 'hotpink',
+    },
+    {
+      name: '赞助者们',
+      url: '/sponsors/',
+      icon: 'i-ri-heart-line',
+      color: 'red',
     },
   ],
 

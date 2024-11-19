@@ -17,7 +17,7 @@ withDefaults(defineProps<{
 @use "valaxy/client/styles/mixins/index.scss" as *;
 
 .va-overlay {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgb(0 0 0 / 0.3);
   position: fixed;
   inset: 0;
   z-index: calc(var(--va-z-overlay) - 1);

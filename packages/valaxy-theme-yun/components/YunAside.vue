@@ -1,72 +1,96 @@
 <script lang="ts" setup>
 import { useI18n } from 'vue-i18n'
-import { useAppStore, useFrontmatter } from 'valaxy'
+import { useFrontmatter } from 'valaxy'
+import { computed, nextTick, ref, watch } from 'vue'
+import { useYunAppStore } from '../stores'
 
-const frontmatter = useFrontmatter()
+const fm = useFrontmatter()
 const { t } = useI18n()
-const app = useAppStore()
+const yun = useYunAppStore()
+
+const show = ref(false)
+const showToc = computed(() => {
+  return fm.value.toc !== false
+})
+
+// aside float
+const isAsideFloat = ref(false)
+
+watch(() => [yun.rightSidebar.isOpen, yun.size.isXl], async () => {
+  await nextTick()
+  isAsideFloat.value = !yun.size.isXl
+  show.value = (yun.rightSidebar.isOpen || !isAsideFloat.value) && fm.value.aside !== false
+}, {
+  immediate: true,
+})
 </script>
 
 <template>
-  <button
-    class="xl:hidden toc-btn shadow fixed yun-icon-btn z-350"
-    opacity="75" right="2" bottom="19"
-    @click="app.toggleRightSidebar()"
-  >
-    <div i-ri-file-list-line />
-  </button>
-
-  <ValaxyOverlay :show="app.isRightSidebarOpen" @click="app.toggleRightSidebar()" />
-
-  <!--  -->
   <aside
-    class="va-card yun-aside"
-    :class="app.isRightSidebarOpen && 'open'" m="l-4" text="center"
+    flex="~ col"
+    class="va-card yun-aside sticky top-0 lg:top-$yun-margin-top min-h-sm"
+    :class="{
+      float: isAsideFloat,
+      show,
+      open: yun.rightSidebar.isOpen,
+    }"
+    text="center"
     overflow="auto"
   >
-    <div class="aside-container" flex="~ col">
-      <h2 v-if="frontmatter.toc !== false" m="t-6 b-2" font="serif black">
-        {{ t('sidebar.toc') }}
-      </h2>
+    <Transition name="fade" :delay="100">
+      <div v-show="show" class="w-full" flex="~ col" pb-2>
+        <template v-if="showToc">
+          <h2
+            m="t-6 b-2"
+            font="serif black"
+          >
+            {{ t('sidebar.toc') }}
+          </h2>
+          <YunOutline />
+        </template>
 
-      <YunOutline v-if="frontmatter.toc !== false" />
+        <div class="flex-grow" />
 
-      <div class="flex-grow" />
-
-      <div v-if="$slots.default" class="custom-container">
-        <slot />
+        <div v-if="$slots.default" class="custom-container">
+          <slot />
+        </div>
       </div>
-    </div>
+    </Transition>
   </aside>
 </template>
 
 <style lang="scss">
+@use 'sass:map';
 @use 'valaxy/client/styles/mixins/index.scss' as *;
+@use 'valaxy-theme-yun/styles/vars.scss' as *;
 
 .yun-aside {
-  position: fixed;
-  right: 0;
-  top: 0;
-  bottom: 0;
-
   // need fixed width
-  width: var(--va-sidebar-width, 300px);
+  // width: var(--va-sidebar-width, 300px);
+  width: 0;
   transform: translateX(100%);
-  transition: box-shadow var(--va-transition-duration),
-  background-color var(--va-transition-duration), opacity 0.25s,
-  transform var(--va-transition-duration) cubic-bezier(0.19, 1, 0.22, 1);
+  transition: all 0.2s map.get($cubic-bezier, 'ease-in-out');
+  max-height: calc(100vh - var(--yun-margin-top));
 
-  &.open {
+  // float panel
+  &.float {
+    position: fixed;
+    top: 0;
     right: 0;
-    display: block;
-    z-index: 10;
-    transform: translateX(0);
+    bottom: 0;
+    z-index: var(--yun-z-aside);
+    max-height: 100vh;
   }
 
-  &-container {
-    position: sticky;
-    top: 0;
-    height: 100vh;
+  &.show {
+    width: 320px;
+  }
+
+  &.open {
+    width: 320px;
+    right: 0;
+    display: block;
+    transform: translateX(0);
   }
 }
 
@@ -78,7 +102,6 @@ const app = useAppStore()
 
 .toc-btn {
   color: var(--va-c-primary);
-  background-color: white;
   z-index: var(--yun-z-toc-btn);
 }
 </style>

@@ -9,19 +9,23 @@ import consola from 'consola'
 import type { InlineConfig, ViteDevServer } from 'vite'
 import { mergeConfig } from 'vite'
 import { version } from 'valaxy/package.json'
+import ora from 'ora'
+import { colors } from 'consola/utils'
 import type { ValaxyNode } from '../../types'
 import { createServer } from '../../server'
 import type { ResolvedValaxyOptions } from '../../options'
 import { mergeViteConfigs } from '../../common'
-import { vLogger } from '../../logger'
+import { vLogger, valaxyPrefix } from '../../logger'
 
 let server: ViteDevServer | undefined
 
 export function printInfo(options: ResolvedValaxyOptions, port?: number, remote?: string | boolean) {
+  const themeVersion = blue(`v${options.config.themeConfig?.pkg?.version}`) || 'unknown'
+
   console.log()
   console.log(`  ${bold('🌌 Valaxy')}  ${blue(`v${version}`)}`)
   console.log()
-  console.log(`${dim('  🪐 theme  ')} > ${(options.theme ? green(options.theme) : gray('none'))}`)
+  console.log(`${dim('  🪐 theme  ')} > ${(options.theme ? green(options.theme) : gray('none'))} (${themeVersion})`)
   console.log(`  ${dim('📁')} ${dim(path.resolve(options.userRoot))}`)
   if (port) {
     console.log()
@@ -58,6 +62,7 @@ export function printInfo(options: ResolvedValaxyOptions, port?: number, remote?
 //   'extendMd',
 // ]
 
+export const serverSpinner = ora(`${valaxyPrefix} creating server ...`)
 export async function initServer(valaxyApp: ValaxyNode, viteConfig: InlineConfig) {
   if (server) {
     vLogger.info('close server...')
@@ -66,6 +71,7 @@ export async function initServer(valaxyApp: ValaxyNode, viteConfig: InlineConfig
 
   const { options } = valaxyApp
 
+  serverSpinner.start()
   const viteConfigs: InlineConfig = mergeConfig(
     await mergeViteConfigs(options, 'serve'),
     viteConfig,
@@ -99,8 +105,7 @@ export async function initServer(valaxyApp: ValaxyNode, viteConfig: InlineConfig
       },
     })
     await server.listen()
-    // consola.success(, 'server ready')
-    vLogger.ready('server ready')
+    serverSpinner.succeed(`${valaxyPrefix} ${colors.green('server ready.')}`)
   }
   catch (e) {
     consola.error('failed to start server. error:\n')
